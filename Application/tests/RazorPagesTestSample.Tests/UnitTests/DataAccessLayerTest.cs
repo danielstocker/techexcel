@@ -25,7 +25,7 @@ namespace RazorPagesTestSample.Tests.UnitTests
                 // Assert
                 var actualMessages = Assert.IsAssignableFrom<List<Message>>(result);
                 Assert.Equal(
-                    expectedMessages.OrderBy(m => m.Id).Select(m => m.Text), 
+                    expectedMessages.OrderBy(m => m.Id).Select(m => m.Text),
                     actualMessages.OrderBy(m => m.Id).Select(m => m.Text));
             }
         }
@@ -38,6 +38,27 @@ namespace RazorPagesTestSample.Tests.UnitTests
                 // Arrange
                 var recId = 10;
                 var expectedMessage = new Message() { Id = recId, Text = "Message" };
+
+                // Act
+                await db.AddMessageAsync(expectedMessage);
+
+                // Assert
+                var actualMessage = await db.FindAsync<Message>(recId);
+                Assert.Equal(expectedMessage, actualMessage);
+            }
+        }
+
+        [Fact]
+        public async Task AddLongMessageAsync_MessageIsAdded()
+        {
+            using (var db = new AppDbContext(Utilities.TestDbContextOptions()))
+            {
+                // Arrange
+                var recId = 12;
+                // generate string that is over 250 characthers long
+                var longString = new string('a', 251);
+                var expectedMessage = new Message() { Id = recId, Text = longString };
+                var messageLength = expectedMessage.Text.Length;
 
                 // Act
                 await db.AddMessageAsync(expectedMessage);
@@ -77,7 +98,7 @@ namespace RazorPagesTestSample.Tests.UnitTests
                 await db.AddRangeAsync(seedMessages);
                 await db.SaveChangesAsync();
                 var recId = 1;
-                var expectedMessages = 
+                var expectedMessages =
                     seedMessages.Where(message => message.Id != recId).ToList();
                 #endregion
 
@@ -90,7 +111,7 @@ namespace RazorPagesTestSample.Tests.UnitTests
                 // Assert
                 var actualMessages = await db.Messages.AsNoTracking().ToListAsync();
                 Assert.Equal(
-                    expectedMessages.OrderBy(m => m.Id).Select(m => m.Text), 
+                    expectedMessages.OrderBy(m => m.Id).Select(m => m.Text),
                     actualMessages.OrderBy(m => m.Id).Select(m => m.Text));
                 #endregion
             }
@@ -121,7 +142,7 @@ namespace RazorPagesTestSample.Tests.UnitTests
                 // Assert
                 var actualMessages = await db.Messages.AsNoTracking().ToListAsync();
                 Assert.Equal(
-                    expectedMessages.OrderBy(m => m.Id).Select(m => m.Text), 
+                    expectedMessages.OrderBy(m => m.Id).Select(m => m.Text),
                     actualMessages.OrderBy(m => m.Id).Select(m => m.Text));
             }
         }
